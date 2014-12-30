@@ -9,38 +9,53 @@
 'use strict';
 
 module.exports = function (grunt) {
-    // Project configuration.
+    require('time-grunt')(grunt);
+
     grunt.initConfig({
-        jshint: {
-            options: {
-                jshintrc: true,
+        eslint: {
+            all: {
+                src: [
+                    '*.js',
+                    'tasks',
+                    'test',
+                ],
             },
+        },
+
+        jscs: {
             all: {
                 src: [
                     'Gruntfile.js',
-                    'tasks/*.js',
-                    'test/spec/**/*.js',
+                    'tasks/**/*.js',
+                    'test/**/*.js',
                 ],
+                options: {
+                    config: '.jscsrc',
+                },
             },
         },
 
         // Configuration to be run (and tested).
         checkDependencies: {
-            thisPackage: {
-                options: {
-                    npmInstall: true,
-                },
-            },
             ok: {
                 options: {
-                    packageDir: 'test/ok/',
-                    scopeList: ['peerDependencies', 'dependencies', 'devDependencies'],
+                    packageDir: './test/ok/',
                 },
             },
             notOk: {
                 options: {
-                    packageDir: 'test/not-ok/',
-                    scopeList: ['peerDependencies', 'dependencies', 'devDependencies'],
+                    packageDir: './test/not-ok/',
+                },
+            },
+            notOkCopyInstall: {
+                options: {
+                    packageDir: './test/not-ok-install-copy/',
+                    install: true,
+                },
+            },
+            notOkCopy: {
+                options: {
+                    packageDir: './test/not-ok-install-copy/',
                 },
             },
         },
@@ -51,8 +66,8 @@ module.exports = function (grunt) {
                 options: {
                     reporter: 'spec',
                 },
-                src: ['test/spec.js']
-            }
+                src: ['test/spec.js'],
+            },
         },
     });
 
@@ -62,11 +77,16 @@ module.exports = function (grunt) {
     // Actually load this plugin's task(s).
     grunt.loadTasks('tasks');
 
+    grunt.registerTask('lint', [
+        'eslint',
+        'jscs',
+    ]);
+
     grunt.registerTask('test', ['mochaTest']);
 
     // By default, lint and run all tests.
     grunt.registerTask('default', [
-        'jshint',
+        'lint',
         'test',
     ]);
 };
